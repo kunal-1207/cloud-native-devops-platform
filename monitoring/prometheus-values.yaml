@@ -1,0 +1,16 @@
+alertmanager:
+  enabled: true
+
+prometheus-pushgateway:
+  enabled: false
+
+server:
+  persistentVolume:
+    size: 20Gi
+  retention: 15d
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
