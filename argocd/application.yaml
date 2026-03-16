@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-username/your-repo.git
+    repoURL: https://github.com/kunal-1207/cloud-native-devops-platform.git
     targetRevision: HEAD
     path: helm/application-chart
     helm:
