@@ -44,4 +44,4 @@ jobs:
       with:
         context: ./application
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/cloud-native-devops-app:latest
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/cloud-native-devops-platform-app:latest

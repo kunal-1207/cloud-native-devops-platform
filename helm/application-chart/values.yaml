@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  repository: kunal/cloud-native-devops-app
+  repository: kunal1207/cloud-native-devops-platform-app
   pullPolicy: IfNotPresent
   tag: "latest"
 
