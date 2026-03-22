@@ -7,6 +7,8 @@
 
 A fully automated, production-ready Cloud Native platform showcasing modern DevOps practices. This repository implements a complete lifecycle for containerized applications, from automated infrastructure provisioning to GitOps-driven deployments and comprehensive observability.
 
+![Platform Dashboard](images/dashboard.png)
+
 ---
 
 ## 🏗️ Architecture Overview
@@ -59,8 +61,8 @@ graph TD
 
 Modular Terraform configurations located in `/infrastructure` manage the entire AWS environment.
 
-- **Networking**: Custom VPC with public/private subnets and NAT Gateways.
-- **Compute**: Managed Amazon EKS cluster with optimized Node Groups.
+- **High Availability**: Custom VPC with Multi-AZ NAT Gateways, ensuring zero downtime for outbound traffic from private subnets.
+- **Compute**: Managed Amazon EKS cluster with optimized Node Groups and secured communication via cluster-associated security groups.
 
 ### 🔄 GitOps Continuous Delivery
 
@@ -114,4 +116,6 @@ The application is configured to handle traffic spikes via **Horizontal Pod Auto
 
 ---
 
-
+<p align="center">
+  Developed with ❤️ for the Cloud Native Ecosystem.
+</p>

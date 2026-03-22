@@ -12,7 +12,8 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://application-chart.production.svc.cluster.local');
+  const targetUrl = __ENV.TARGET_URL || 'http://application-chart.production.svc.cluster.local';
+  const res = http.get(targetUrl);
   check(res, {
     'status is 200': (r) => r.status === 200,
   });

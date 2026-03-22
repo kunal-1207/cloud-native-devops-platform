@@ -3,7 +3,8 @@ resource "aws_eks_cluster" "main" {
   role_arn = var.eks_cluster_role_arn
 
   vpc_config {
-    subnet_ids = var.private_subnet_ids
+    subnet_ids         = var.private_subnet_ids
+    security_group_ids = [aws_security_group.eks_cluster.id]
   }
 }
 
