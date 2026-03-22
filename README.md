@@ -116,6 +116,3 @@ The application is configured to handle traffic spikes via **Horizontal Pod Auto
 
 ---
 
-<p align="center">
-  Developed with ❤️ for the Cloud Native Ecosystem.
-</p>
