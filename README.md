@@ -1,11 +1,11 @@
 # 🚀 Cloud Native DevOps Platform
 
-[![Terraform](https://img.shields.io/badge/IAC-Terraform-blueviolet?style=for-the-badge&logo=terraform)](https://www.terraform.io/)
-[![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-blue?style=for-the-badge&logo=kubernetes)](https://kubernetes.io/)
-[![ArgoCD](https://img.shields.io/badge/GitOps-ArgoCD-orange?style=for-the-badge&logo=argo)](https://argoproj.github.io/cd/)
-[![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus-critical?style=for-the-badge&logo=prometheus)](https://prometheus.io/)
+[![Terraform](https://img.shields.io/badge/IAC-Terraform-blueviolet?style=for-the-badge\&logo=terraform)](https://www.terraform.io/)
+[![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-blue?style=for-the-badge\&logo=kubernetes)](https://kubernetes.io/)
+[![ArgoCD](https://img.shields.io/badge/GitOps-ArgoCD-orange?style=for-the-badge\&logo=argo)](https://argoproj.github.io/cd/)
+[![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus-critical?style=for-the-badge\&logo=prometheus)](https://prometheus.io/)
 
-A fully automated, production-ready Cloud Native platform showcasing modern DevOps practices. This repository implements a complete lifecycle for containerized applications, from automated infrastructure provisioning to GitOps-driven deployments and comprehensive observability.
+A production-grade, end-to-end Cloud Native platform implementing modern DevOps and SRE practices. This project demonstrates automated infrastructure provisioning, GitOps-based continuous delivery, and full-stack observability for containerized workloads running on Kubernetes.
 
 ![Platform Dashboard](images/dashboard.png)
 
@@ -13,45 +13,56 @@ A fully automated, production-ready Cloud Native platform showcasing modern DevO
 
 ## 🏗️ Architecture Overview
 
-The platform follows a **Hub-and-Spoke** GitOps model, utilizing AWS as the primary cloud provider.
+The platform follows a **Hub-and-Spoke GitOps model**, with AWS as the underlying cloud infrastructure and Git serving as the single source of truth.
 
 ```mermaid
 graph TD
     User([Developer]) -->|Push Code| Github[GitHub Repository]
-    Github -->|Trigger| GHA[GitHub Actions]
-    GHA -->|Build & Push| ECR[Amazon ECR]
+    Github -->|Trigger CI| GHA[GitHub Actions]
+    GHA -->|Build & Push Image| ECR[Amazon ECR]
     
-    subgraph AWS Cloud
-        subgraph EKS Cluster
+    subgraph AWS_Cloud
+        subgraph EKS_Cluster
             ArgoCD[ArgoCD Controller]
-            App[Python Flask API]
-            Prom[Prometheus/Grafana]
+            App[Flask API - Gunicorn]
+            Observability[Prometheus Grafana Loki]
         end
-        VPC[AWS VPC/Networking]
-        IAM[IAM Roles/Security]
+        VPC[AWS VPC]
+        IAM[IAM Roles and Policies]
     end
 
-    Github -->|Sync Manifests| ArgoCD
+    Github -->|Sync Desired State| ArgoCD
     ArgoCD -->|Deploy| App
-    Prom -->|Monitor| App
-    Terraform[Terraform] -->|Provision| VPC
-    Terraform -->|Provision| EKS
-    Terraform -->|Provision| IAM
+    Observability -->|Metrics and Logs| App
+    Terraform[Terraform] -->|Provision Infra| VPC
+    Terraform -->|Provision Infra| EKS_Cluster
+    Terraform -->|Provision Infra| IAM
 ```
+
+---
+
+### 🔍 System Flow
+
+1. Developer pushes code to GitHub
+2. GitHub Actions builds Docker image and pushes to Amazon ECR
+3. ArgoCD detects manifest changes from Git
+4. Kubernetes cluster state is reconciled automatically
+5. Application is deployed and exposed
+6. Prometheus & Grafana continuously monitor system health
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Category | Tools |
-| :--- | :--- |
-| **Cloud Provider** | AWS (EKS, VPC, IAM, ECR) |
-| **Infrastructure** | Terraform |
-| **Orchestration** | Kubernetes |
-| **CI/CD & GitOps** | GitHub Actions, ArgoCD |
-| **Application** | Python (Flask), Gunicorn, Docker |
-| **Monitoring** | Prometheus, Grafana, Loki, Promtail |
-| **Testing** | Pytest, k6 (Load Testing) |
+| Category                    | Tools                               |
+| :-------------------------- | :---------------------------------- |
+| **Cloud Provider**          | AWS (EKS, VPC, IAM, ECR)            |
+| **Infrastructure as Code**  | Terraform                           |
+| **Container Orchestration** | Kubernetes                          |
+| **CI/CD & GitOps**          | GitHub Actions, ArgoCD              |
+| **Application Layer**       | Python (Flask), Gunicorn, Docker    |
+| **Observability**           | Prometheus, Grafana, Loki, Promtail |
+| **Testing & Performance**   | Pytest, k6                          |
 
 ---
 
@@ -59,23 +70,61 @@ graph TD
 
 ### 🔐 Infrastructure as Code (IaC)
 
-Modular Terraform configurations located in `/infrastructure` manage the entire AWS environment.
+Terraform modules in `/infrastructure` provision a fully isolated and production-ready AWS environment.
 
-- **High Availability**: Custom VPC with Multi-AZ NAT Gateways, ensuring zero downtime for outbound traffic from private subnets.
-- **Compute**: Managed Amazon EKS cluster with optimized Node Groups and secured communication via cluster-associated security groups.
+* **High Availability Architecture**
+
+  * Multi-AZ VPC with public and private subnets
+  * NAT Gateways for secure outbound connectivity
+
+* **Managed Kubernetes**
+
+  * Amazon EKS cluster with optimized node groups
+  * Secure communication via IAM roles and security groups
+
+---
 
 ### 🔄 GitOps Continuous Delivery
 
-The `/argocd` directory contains the source of truth for the cluster state.
+The `/argocd` directory acts as the **single source of truth** for cluster state.
 
-- ArgoCD automatically synchronizes the cluster state with the Git repository.
-- **Self-healing**: Any manual changes to the cluster are automatically reverted to the Git-defined state.
+* **Declarative Deployments**
+
+  * All Kubernetes manifests version-controlled in Git
+
+* **Automated Sync**
+
+  * ArgoCD continuously reconciles desired vs actual state
+
+* **Self-Healing System**
+
+  * Manual drift is automatically corrected
+
+---
 
 ### 📈 Observability & Reliability
 
-- **Full Stack Monitoring**: Integrated Prometheus and Grafana for metrics visualization.
-- **Fault Tolerance**: Horizontal Pod Autoscaler (HPA) and automated pod self-healing.
-- **Load Testing**: k6 scripts in `/testing` to validate performance under stress.
+* **Metrics Monitoring**
+
+  * Prometheus collects system and application metrics
+  * Grafana dashboards provide real-time visualization
+
+* **Centralized Logging**
+
+  * Loki + Promtail pipeline for log aggregation and querying
+
+* **Resilience Engineering**
+
+  * Kubernetes self-healing (pod restarts, rescheduling)
+  * Horizontal Pod Autoscaler (HPA) for dynamic scaling
+
+---
+
+### ⚡ Performance & Load Testing
+
+* k6 scripts simulate real-world traffic patterns
+* Validates system behavior under stress conditions
+* Helps identify bottlenecks and scaling limits
 
 ---
 
@@ -85,34 +134,75 @@ The `/argocd` directory contains the source of truth for the cluster state.
 
 ```bash
 cd application/
+
 python -m venv venv
-# Activate: venv\Scripts\activate (Windows) or source venv/bin/activate (Linux/Mac)
+
+# Activate environment
+# Windows:
+venv\Scripts\activate
+
+# Linux / Mac:
+source venv/bin/activate
+
 pip install -r requirements.txt
+
+# Run tests
 python -m pytest tests/
+
+# Start application
 python app/main.py
 ```
+
+---
 
 ### 2. Infrastructure Provisioning
 
 ```bash
 cd infrastructure/terraform
+
 terraform init
 terraform apply -auto-approve
 ```
 
+This step provisions:
+
+* VPC networking
+* EKS cluster
+* IAM roles and policies
+
+---
+
 ### 3. Application Deployment
 
-Ensure your `kubectl` context is set to the new cluster:
+Ensure `kubectl` is configured for the EKS cluster:
 
 ```bash
 kubectl apply -f argocd/application.yaml
 ```
 
+ArgoCD will automatically:
+
+* Pull manifests from Git
+* Deploy application to the cluster
+* Maintain desired state
+
 ---
 
 ## 📊 Maintenance & Scaling
 
-The application is configured to handle traffic spikes via **Horizontal Pod Autoscaling (HPA)**. Resource limits are strictly enforced to ensure cluster stability. Explore the `/reliability` directory for detailed failure simulation scenarios.
+* **Horizontal Pod Autoscaler (HPA)**
+
+  * Dynamically scales pods based on CPU/memory utilization
+
+* **Resource Management**
+
+  * Requests and limits enforced to prevent resource starvation
+
+* **Failure Handling**
+
+  * Pods automatically restarted on failure
+  * Nodes rescheduled in case of disruption
+
+Explore `/reliability` for chaos testing and failure simulation scenarios.
 
 ---
-
